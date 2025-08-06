@@ -10,13 +10,19 @@
     "stats": "node bot.js stats"
   },
   "dependencies": {
-    "twitter-api-v2": "^1.15.0",
-    "node-cron": "^3.0.3",
     "dotenv": "^16.3.1",
+    "form-data": "^4.0.4",
     "fs-extra": "^11.1.1",
-    "openai": "^4.20.1"
+    "node-cron": "^3.0.3",
+    "openai": "^4.20.1",
+    "twitter-api-v2": "^1.15.0"
   },
-  "keywords": ["twitter", "bot", "automation", "social-media"],
+  "keywords": [
+    "twitter",
+    "bot",
+    "automation",
+    "social-media"
+  ],
   "author": "Your Name",
   "license": "MIT"
 }

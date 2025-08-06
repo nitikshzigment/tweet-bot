@@ -9,6 +9,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const https = require('https');
 const http = require('http');
+const FormData = require('form-data');
 // Load environment variables - try multiple sources for Railway deployment
 require('dotenv').config({ path: './bot.env' });
 require('dotenv').config({ path: './.env' });
@@ -51,6 +52,9 @@ class TwitterBot {
       'TWITTER_ACCESS_TOKEN',
       'TWITTER_ACCESS_SECRET'
     ];
+
+    // Optional: Grok API for image generation
+    this.grokApiKey = process.env.GROK_API_KEY;
 
     const missingVars = requiredVars.filter(varName => !process.env[varName]);
     
@@ -136,7 +140,7 @@ class TwitterBot {
     }
   }
 
-  // Generate AI image based on tweet content
+  // Generate AI image using Grok API
   async generateAIImage(tweetText) {
     try {
       // Extract key technical terms for image generation
@@ -151,28 +155,136 @@ class TwitterBot {
         tweetText.toLowerCase().includes(term)
       );
       
-      let imagePrompt = 'Technical visualization of ';
+      let imagePrompt = 'Create a technical visualization of ';
       if (foundTerms.length > 0) {
         imagePrompt += foundTerms[0] + ' concept';
       } else {
         imagePrompt += 'AI and machine learning';
       }
       
-      imagePrompt += ', digital art style, professional, clean, modern';
+      imagePrompt += ', digital art style, professional, clean, modern, technical diagram, futuristic, blue and white color scheme';
       
-      // TODO: Integrate with your preferred AI image API
-      // For now, return a placeholder
-      this.log(`Image prompt generated: "${imagePrompt}"`);
+      this.log(`Generating image with prompt: "${imagePrompt}"`);
+      
+      // Call Grok API for image generation
+      const imageUrl = await this.callGrokImageAPI(imagePrompt);
       
       return {
         prompt: imagePrompt,
-        imageUrl: null // Will be set when API is integrated
+        imageUrl: imageUrl
       };
       
     } catch (error) {
       this.log(`Error generating AI image: ${error.message}`);
       return null;
     }
+  }
+
+  // Download image from URL and upload to Twitter
+  async uploadImageToTwitter(imageUrl) {
+    try {
+      this.log(`Downloading image from: ${imageUrl}`);
+      
+      // Download image
+      const imageBuffer = await this.downloadImage(imageUrl);
+      if (!imageBuffer) {
+        this.log('Failed to download image');
+        return null;
+      }
+      
+      // Upload to Twitter
+      const mediaId = await this.rwClient.v1.uploadMedia(imageBuffer, { mimeType: 'image/jpeg' });
+      this.log(`Image uploaded to Twitter (Media ID: ${mediaId})`);
+      
+      return mediaId;
+    } catch (error) {
+      this.log(`Error uploading image to Twitter: ${error.message}`);
+      return null;
+    }
+  }
+
+  // Download image from URL
+  async downloadImage(url) {
+    return new Promise((resolve) => {
+      const protocol = url.startsWith('https') ? https : http;
+      
+      protocol.get(url, (res) => {
+        if (res.statusCode !== 200) {
+          this.log(`Failed to download image: ${res.statusCode}`);
+          resolve(null);
+          return;
+        }
+        
+        const chunks = [];
+        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('end', () => {
+          const buffer = Buffer.concat(chunks);
+          this.log(`Image downloaded: ${buffer.length} bytes`);
+          resolve(buffer);
+        });
+      }).on('error', (error) => {
+        this.log(`Error downloading image: ${error.message}`);
+        resolve(null);
+      });
+    });
+  }
+
+  // Call Grok API for image generation
+  async callGrokImageAPI(prompt) {
+    return new Promise((resolve, reject) => {
+      const postData = JSON.stringify({
+        prompt: prompt,
+        model: "dall-e-3",
+        n: 1
+      });
+
+      const options = {
+        hostname: 'api.x.ai',
+        port: 443,
+        path: '/v1/images/generations',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+          'Authorization': `Bearer ${this.grokApiKey}`
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+        
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        
+        res.on('end', () => {
+          try {
+            const response = JSON.parse(data);
+            if (response.data && response.data[0] && response.data[0].url) {
+              this.log(`Image generated successfully: ${response.data[0].url}`);
+              resolve(response.data[0].url);
+            } else if (response.error && response.error.includes('credits')) {
+              this.log(`Grok API credits required. Please add credits to your account.`);
+              resolve(null);
+            } else {
+              this.log(`No image URL in response: ${JSON.stringify(response)}`);
+              resolve(null);
+            }
+          } catch (error) {
+            this.log(`Error parsing Grok API response: ${error.message}`);
+            resolve(null);
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        this.log(`Error calling Grok API: ${error.message}`);
+        resolve(null);
+      });
+
+      req.write(postData);
+      req.end();
+    });
   }
 
   // Generate AI tweet using OpenAI (if configured)
@@ -375,10 +487,20 @@ class TwitterBot {
       // Post the tweet (with image if available)
       let tweet;
       if (imageData && imageData.imageUrl) {
-        // TODO: Upload image and attach to tweet
-        // For now, post text only
-        tweet = await this.rwClient.v2.tweet(text);
-        this.log(`Image prompt: "${imageData.prompt}"`);
+        try {
+          // Download and upload image to Twitter
+          const mediaId = await this.uploadImageToTwitter(imageData.imageUrl);
+          if (mediaId) {
+            tweet = await this.rwClient.v2.tweet(text, { media: { media_ids: [mediaId] } });
+            this.log(`Tweet posted with image (Media ID: ${mediaId})`);
+          } else {
+            tweet = await this.rwClient.v2.tweet(text);
+            this.log(`Image generation failed, posted text only`);
+          }
+        } catch (error) {
+          this.log(`Error posting tweet with image: ${error.message}`);
+          tweet = await this.rwClient.v2.tweet(text);
+        }
       } else {
         tweet = await this.rwClient.v2.tweet(text);
       }
