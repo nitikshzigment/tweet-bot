@@ -7,6 +7,8 @@ const { TwitterApi } = require('twitter-api-v2');
 const cron = require('node-cron');
 const fs = require('fs-extra');
 const path = require('path');
+const https = require('https');
+const http = require('http');
 // Load environment variables - try multiple sources for Railway deployment
 require('dotenv').config({ path: './bot.env' });
 require('dotenv').config({ path: './.env' });
@@ -62,17 +64,24 @@ class TwitterBot {
     try {
       // Create content file if it doesn't exist
       if (!await fs.pathExists(this.contentFile)) {
-        const defaultContent = {
-          tweets: [
-            "The real trolley problem is deciding whether to correct someone's grammar online or preserve the social fabric 🚋",
-            "Schrödinger's email: simultaneously urgent and spam until you open it 📧",
-            "My sleep schedule is more like a sleep suggestion at this point 😴",
-            "Netflix asking 'Are you still watching?' is the digital equivalent of your mom asking if you're okay 📺",
-            "According to the second law of thermodynamics, my room will always tend toward maximum entropy. I'm just helping physics along 🔬",
-            "The observer effect: my productivity increases dramatically when my boss walks by 👀",
-            "Late capitalism is having 47 streaming services and still nothing to watch 📱",
-            "My biggest flex is remembering to bring my reusable bags to the grocery store exactly once 🛍️"
-          ],
+              const defaultContent = {
+        tweets: [
+          "Just implemented a custom loss function that's more complex than my dating life 📊 #MachineLearning #QuantFinance",
+          "When your neural network converges faster than your career goals 🧠 #AI #DeepLearning",
+          "The real alpha isn't in the market, it's in the data preprocessing pipeline 📈 #QuantTrading #DataScience",
+          "My portfolio's Sharpe ratio is higher than my social skills 📊 #Finance #Quantitative",
+          "Backtesting: where hindsight bias meets overfitting anxiety 📉 #Trading #MachineLearning",
+          "Feature engineering is like cooking - the right ingredients make all the difference 🍳 #ML #DataScience",
+          "When your model predicts market crashes better than it predicts my life decisions 📊 #QuantFinance #AI",
+          "The only thing more volatile than crypto is my attention span during meetings 📈 #Trading #Tech",
+          "Gradient descent: the algorithm that descends faster than my motivation on Mondays 📉 #DeepLearning #ML",
+          "Cross-validation is like dating multiple people to avoid overfitting your heart 💔 #MachineLearning #Humor",
+          "My risk management is better than my life management 📊 #QuantTrading #Finance",
+          "When your ensemble model is more diverse than your friend group 🤖 #AI #MachineLearning",
+          "The market is efficient, but my code is not 🐛 #QuantFinance #Programming",
+          "Feature importance: where SHAP values reveal more than therapy sessions 📊 #ML #DataScience",
+          "My backtest results are more impressive than my LinkedIn profile 📈 #Quantitative #Trading"
+        ],
           schedules: [
             { time: "09:00", timezone: "America/New_York" },
             { time: "14:30", timezone: "America/New_York" },
@@ -95,15 +104,15 @@ class TwitterBot {
       // Create AI configuration file
       if (!await fs.pathExists(this.aiConfigFile)) {
         const defaultAIConfig = {
-          enabled: false,
+          enabled: true,
           service: "openai", // or "local", "custom"
-          prompt: "Generate a witty, engaging tweet about technology, life, or current trends. Keep it under 280 characters and make it relatable and shareable. Include relevant emojis.",
+          prompt: "Generate a witty, technical tweet about AI, machine learning, quantitative finance, or trading. Make it humorous but sophisticated, targeting AI/ML/Quant professionals. Include technical terms like 'neural networks', 'backtesting', 'Sharpe ratio', 'feature engineering', 'gradient descent', etc. Keep it under 280 characters and include relevant emojis and hashtags.",
           maxLength: 280,
-          temperature: 0.7,
+          temperature: 0.8,
           includeHashtags: true,
-          hashtagCount: 2,
-          topics: ["technology", "life", "humor", "current events"],
-          style: "witty and engaging"
+          hashtagCount: 3,
+          topics: ["AI", "MachineLearning", "QuantFinance", "Trading", "DataScience", "DeepLearning", "Quantitative", "Programming"],
+          style: "technical, witty, and sophisticated"
         };
         await fs.writeJson(this.aiConfigFile, defaultAIConfig, { spaces: 2 });
       }
@@ -127,6 +136,45 @@ class TwitterBot {
     }
   }
 
+  // Generate AI image based on tweet content
+  async generateAIImage(tweetText) {
+    try {
+      // Extract key technical terms for image generation
+      const technicalTerms = [
+        'neural network', 'machine learning', 'AI', 'algorithm', 'data science',
+        'quantitative', 'trading', 'finance', 'backtesting', 'sharpe ratio',
+        'gradient descent', 'feature engineering', 'deep learning', 'model',
+        'prediction', 'analysis', 'code', 'programming', 'statistics'
+      ];
+      
+      const foundTerms = technicalTerms.filter(term => 
+        tweetText.toLowerCase().includes(term)
+      );
+      
+      let imagePrompt = 'Technical visualization of ';
+      if (foundTerms.length > 0) {
+        imagePrompt += foundTerms[0] + ' concept';
+      } else {
+        imagePrompt += 'AI and machine learning';
+      }
+      
+      imagePrompt += ', digital art style, professional, clean, modern';
+      
+      // TODO: Integrate with your preferred AI image API
+      // For now, return a placeholder
+      this.log(`Image prompt generated: "${imagePrompt}"`);
+      
+      return {
+        prompt: imagePrompt,
+        imageUrl: null // Will be set when API is integrated
+      };
+      
+    } catch (error) {
+      this.log(`Error generating AI image: ${error.message}`);
+      return null;
+    }
+  }
+
   // Generate AI tweet using OpenAI (if configured)
   async generateAITweet() {
     try {
@@ -144,45 +192,101 @@ class TwitterBot {
         "The real {topic} problem is {relatable_situation}. Can anyone else relate? 😅",
         "Today's {topic} lesson: {witty_insight}. Life is full of surprises! ✨",
         "Plot twist: {topic} is not what we thought. {funny_realization} 😂",
-        "The {topic} struggle is real when {relatable_problem}. Anyone else? 🙋‍♂️"
+        "The {topic} struggle is real when {relatable_problem}. Anyone else? 🙋‍♂️",
+        "When your {topic} model {technical_observation} 📊",
+        "The {topic} algorithm that {funny_behavior} 🧠",
+        "My {topic} implementation is {technical_comparison} 📈"
       ];
 
-      const topics = aiConfig.topics || ["technology", "life", "humor"];
+      const topics = aiConfig.topics || ["AI", "MachineLearning", "QuantFinance", "Trading"];
       const topic = topics[Math.floor(Math.random() * topics.length)];
       
       const observations = {
-        "technology": "more addictive than coffee",
-        "life": "just a series of unexpected plot twists",
-        "humor": "the best medicine, but also the best procrastination tool",
-        "current events": "moving faster than my attention span"
+        "AI": "more complex than my dating algorithm",
+        "MachineLearning": "converging faster than my career goals",
+        "QuantFinance": "generating more alpha than my social skills",
+        "Trading": "more volatile than my attention span",
+        "DataScience": "preprocessing more data than my life decisions",
+        "DeepLearning": "deeper than my understanding of taxes",
+        "Quantitative": "more quantitative than my dating prospects",
+        "Programming": "debugging more bugs than my life choices"
       };
 
       const situations = {
-        "technology": "your phone dies right when you need it most",
-        "life": "you plan everything and nothing goes according to plan",
-        "humor": "you think of the perfect comeback 3 hours later",
-        "current events": "you blink and miss 5 major news stories"
+        "AI": "your neural network overfits more than your dating profile",
+        "MachineLearning": "your model predicts market crashes better than your life",
+        "QuantFinance": "your Sharpe ratio is higher than your social skills",
+        "Trading": "your backtest results are more impressive than your LinkedIn",
+        "DataScience": "your feature engineering is better than your cooking",
+        "DeepLearning": "your gradient descent is smoother than your dating life",
+        "Quantitative": "your risk management is better than your life management",
+        "Programming": "your code is more efficient than your morning routine"
       };
 
       const insights = {
-        "technology": "sometimes the best feature is the off button",
-        "life": "the best plans are the ones you never make",
-        "humor": "laughter is universal, but dad jokes are eternal",
-        "current events": "the only constant is change, and memes"
+        "AI": "sometimes the best feature is the off button",
+        "MachineLearning": "the best models are the ones you never deploy",
+        "QuantFinance": "the real alpha is in the data preprocessing",
+        "Trading": "the market is efficient, but your code is not",
+        "DataScience": "feature importance reveals more than therapy",
+        "DeepLearning": "neural networks are just fancy regression",
+        "Quantitative": "cross-validation prevents overfitting your heart",
+        "Programming": "the best code is the code you don't write"
       };
 
       const realizations = {
-        "technology": "we're all just trying to find the right emoji",
-        "life": "adulting is just pretending you know what you're doing",
-        "humor": "sarcasm is my love language",
-        "current events": "every day is a new adventure in confusion"
+        "AI": "we're all just training on biased data",
+        "MachineLearning": "your model is only as good as your data",
+        "QuantFinance": "the market is more random than your code",
+        "Trading": "your strategy works until it doesn't",
+        "DataScience": "correlation doesn't imply causation, but it's fun to pretend",
+        "DeepLearning": "deep learning is just statistics with better marketing",
+        "Quantitative": "quantitative finance is just applied statistics",
+        "Programming": "programming is just debugging with extra steps"
       };
 
       const problems = {
-        "technology": "your WiFi works everywhere except where you need it",
-        "life": "you're either too early or too late, never just right",
-        "humor": "your jokes are funnier in your head",
-        "current events": "you can't keep up with the news cycle"
+        "AI": "your model works in production but not in your life",
+        "MachineLearning": "your predictions are better than your life choices",
+        "QuantFinance": "your portfolio outperforms your dating life",
+        "Trading": "your algorithm trades better than you date",
+        "DataScience": "your data pipeline is cleaner than your room",
+        "DeepLearning": "your neural network learns faster than you do",
+        "Quantitative": "your models are more sophisticated than your conversations",
+        "Programming": "your code is more organized than your thoughts"
+      };
+
+      const technicalObservations = {
+        "AI": "converges faster than my dating algorithm",
+        "MachineLearning": "overfits more than my dating profile",
+        "QuantFinance": "generates more alpha than my social skills",
+        "Trading": "backtests better than my life decisions",
+        "DataScience": "preprocesses data better than my life",
+        "DeepLearning": "learns patterns faster than I learn from mistakes",
+        "Quantitative": "calculates risk better than I assess situations",
+        "Programming": "debugs faster than I solve problems"
+      };
+
+      const funnyBehaviors = {
+        "AI": "hallucinates more than my dating stories",
+        "MachineLearning": "overfits more than my dating profile",
+        "QuantFinance": "generates more alpha than my social skills",
+        "Trading": "trades more than I date",
+        "DataScience": "cleans data better than I clean my room",
+        "DeepLearning": "learns deeper than my understanding of taxes",
+        "Quantitative": "calculates more than I think",
+        "Programming": "loops more than my dating conversations"
+      };
+
+      const technicalComparisons = {
+        "AI": "more sophisticated than my dating algorithm",
+        "MachineLearning": "more accurate than my life predictions",
+        "QuantFinance": "more profitable than my dating life",
+        "Trading": "more successful than my relationships",
+        "DataScience": "more organized than my thoughts",
+        "DeepLearning": "deeper than my understanding of relationships",
+        "Quantitative": "more precise than my life calculations",
+        "Programming": "more logical than my decision making"
       };
 
       const template = templates[Math.floor(Math.random() * templates.length)];
@@ -192,12 +296,25 @@ class TwitterBot {
         .replace('{relatable_situation}', situations[topic] || "reality hits hard")
         .replace('{witty_insight}', insights[topic] || "life is what happens while you're making other plans")
         .replace('{funny_realization}', realizations[topic] || "we're all just winging it")
-        .replace('{relatable_problem}', problems[topic] || "things don't go as planned");
+        .replace('{relatable_problem}', problems[topic] || "things don't go as planned")
+        .replace('{technical_observation}', technicalObservations[topic] || "behaves unexpectedly")
+        .replace('{funny_behavior}', funnyBehaviors[topic] || "does weird things")
+        .replace('{technical_comparison}', technicalComparisons[topic] || "more advanced than expected");
 
       // Add hashtags if enabled
       if (aiConfig.includeHashtags) {
-        const hashtags = [`#${topic}`, `#Life`, `#Humor`];
-        tweet += ` ${hashtags.slice(0, aiConfig.hashtagCount || 2).join(' ')}`;
+        const technicalHashtags = {
+          "AI": ["#AI", "#MachineLearning", "#Tech"],
+          "MachineLearning": ["#ML", "#DataScience", "#AI"],
+          "QuantFinance": ["#QuantFinance", "#Trading", "#Finance"],
+          "Trading": ["#Trading", "#Quantitative", "#Finance"],
+          "DataScience": ["#DataScience", "#ML", "#Analytics"],
+          "DeepLearning": ["#DeepLearning", "#AI", "#NeuralNetworks"],
+          "Quantitative": ["#Quantitative", "#Finance", "#Trading"],
+          "Programming": ["#Programming", "#Tech", "#Coding"]
+        };
+        const hashtags = technicalHashtags[topic] || [`#${topic}`, "#Tech", "#AI"];
+        tweet += ` ${hashtags.slice(0, aiConfig.hashtagCount || 3).join(' ')}`;
       }
 
       // Ensure tweet is within character limit
@@ -252,8 +369,19 @@ class TwitterBot {
         }
       }
       
-      // Post the tweet
-      const tweet = await this.rwClient.v2.tweet(text);
+      // Generate AI image for the tweet
+      const imageData = await this.generateAIImage(text);
+      
+      // Post the tweet (with image if available)
+      let tweet;
+      if (imageData && imageData.imageUrl) {
+        // TODO: Upload image and attach to tweet
+        // For now, post text only
+        tweet = await this.rwClient.v2.tweet(text);
+        this.log(`Image prompt: "${imageData.prompt}"`);
+      } else {
+        tweet = await this.rwClient.v2.tweet(text);
+      }
       
       // Log the successful post
       await this.trackPostedTweet(text, tweet.data.id);
@@ -381,10 +509,22 @@ class TwitterBot {
     this.log('Starting Twitter bot scheduler...');
 
     try {
-      // Post at scheduled times (adjust timezone as needed)
-      // 9:00 AM EST
+      // Post every 5 minutes for high engagement
+      cron.schedule('*/5 * * * *', async () => {
+        this.log('Scheduled post every 5 minutes');
+        try {
+          await this.postTweet();
+        } catch (error) {
+          this.log(`Scheduled post failed: ${error.message}`);
+        }
+      }, {
+        timezone: 'America/New_York'
+      });
+
+      // Also post at peak times for maximum visibility
+      // 9:00 AM EST - Morning coffee time
       cron.schedule('0 9 * * *', async () => {
-        this.log('Scheduled post at 9:00 AM');
+        this.log('Scheduled post at 9:00 AM (peak time)');
         try {
           await this.postTweet();
         } catch (error) {
@@ -394,9 +534,9 @@ class TwitterBot {
         timezone: 'America/New_York'
       });
 
-      // 2:30 PM EST
-      cron.schedule('30 14 * * *', async () => {
-        this.log('Scheduled post at 2:30 PM');
+      // 12:00 PM EST - Lunch break
+      cron.schedule('0 12 * * *', async () => {
+        this.log('Scheduled post at 12:00 PM (lunch time)');
         try {
           await this.postTweet();
         } catch (error) {
@@ -406,9 +546,9 @@ class TwitterBot {
         timezone: 'America/New_York'
       });
 
-      // 7:00 PM EST
-      cron.schedule('0 19 * * *', async () => {
-        this.log('Scheduled post at 7:00 PM');
+      // 5:00 PM EST - End of work day
+      cron.schedule('0 17 * * *', async () => {
+        this.log('Scheduled post at 5:00 PM (end of work day)');
         try {
           await this.postTweet();
         } catch (error) {
@@ -418,22 +558,19 @@ class TwitterBot {
         timezone: 'America/New_York'
       });
 
-      // Optional: Random posts throughout the day (uncomment to enable)
-      // cron.schedule('0 */4 * * *', async () => {
-      //   // 25% chance to post every 4 hours
-      //   if (Math.random() < 0.25) {
-      //     this.log('Random scheduled post');
-      //     try {
-      //       await this.postTweet();
-      //     } catch (error) {
-      //     this.log(`Random post failed: ${error.message}`);
-      //     }
-      //   }
-      // }, {
-      //   timezone: 'America/New_York'
-      // });
+      // 8:00 PM EST - Evening social time
+      cron.schedule('0 20 * * *', async () => {
+        this.log('Scheduled post at 8:00 PM (evening social)');
+        try {
+          await this.postTweet();
+        } catch (error) {
+          this.log(`Scheduled post failed: ${error.message}`);
+        }
+      }, {
+        timezone: 'America/New_York'
+      });
 
-      this.log('Scheduler started successfully');
+      this.log('Scheduler started successfully - posting every 5 minutes + peak times');
     } catch (error) {
       this.log(`Failed to start scheduler: ${error.message}`);
       throw error;

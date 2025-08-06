@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "service": "openai",
-  "prompt": "Generate a witty, engaging tweet about technology, life, or current trends. Keep it under 280 characters and make it relatable and shareable. Include relevant emojis.",
+  "prompt": "Generate a witty, technical tweet about AI, machine learning, quantitative finance, or trading. Make it humorous but sophisticated, targeting AI/ML/Quant professionals. Include technical terms like 'neural networks', 'backtesting', 'Sharpe ratio', 'feature engineering', 'gradient descent', etc. Keep it under 280 characters and include relevant emojis and hashtags.",
   "maxLength": 280,
   "temperature": 0.7,
   "includeHashtags": true,
