@@ -1,0 +1,26 @@
+{
+  "tweets": [
+    "The real trolley problem is deciding whether to correct someone's grammar online or preserve the social fabric 🚋",
+    "Schrödinger's email: simultaneously urgent and spam until you open it 📧",
+    "My sleep schedule is more like a sleep suggestion at this point 😴",
+    "Netflix asking 'Are you still watching?' is the digital equivalent of your mom asking if you're okay 📺",
+    "According to the second law of thermodynamics, my room will always tend toward maximum entropy. I'm just helping physics along 🔬",
+    "The observer effect: my productivity increases dramatically when my boss walks by 👀",
+    "Late capitalism is having 47 streaming services and still nothing to watch 📱",
+    "My biggest flex is remembering to bring my reusable bags to the grocery store exactly once 🛍️"
+  ],
+  "schedules": [
+    {
+      "time": "09:00",
+      "timezone": "America/New_York"
+    },
+    {
+      "time": "14:30",
+      "timezone": "America/New_York"
+    },
+    {
+      "time": "19:00",
+      "timezone": "America/New_York"
+    }
+  ]
+}
