@@ -59,9 +59,13 @@ jspm_packages/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+<<<<<<< HEAD
 Thumbs.db
 
 # Bot specific files (keep these for tracking)
 # content.json - contains tweet content
 # posted_tweets.json - contains posted tweet history
 # ai-config.json - contains AI configuration 
+=======
+Thumbs.db 
+>>>>>>> a1622bf7430c2dbe57895253cc7bf8ee8c39f7c5
