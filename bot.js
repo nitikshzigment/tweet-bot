@@ -71,21 +71,39 @@ class TwitterBot {
       if (!await fs.pathExists(this.contentFile)) {
               const defaultContent = {
         tweets: [
-          "Just implemented a custom loss function that's more complex than my dating life 📊 #MachineLearning #QuantFinance",
-          "When your neural network converges faster than your career goals 🧠 #AI #DeepLearning",
-          "The real alpha isn't in the market, it's in the data preprocessing pipeline 📈 #QuantTrading #DataScience",
-          "My portfolio's Sharpe ratio is higher than my social skills 📊 #Finance #Quantitative",
-          "Backtesting: where hindsight bias meets overfitting anxiety 📉 #Trading #MachineLearning",
-          "Feature engineering is like cooking - the right ingredients make all the difference 🍳 #ML #DataScience",
-          "When your model predicts market crashes better than it predicts my life decisions 📊 #QuantFinance #AI",
-          "The only thing more volatile than crypto is my attention span during meetings 📈 #Trading #Tech",
-          "Gradient descent: the algorithm that descends faster than my motivation on Mondays 📉 #DeepLearning #ML",
-          "Cross-validation is like dating multiple people to avoid overfitting your heart 💔 #MachineLearning #Humor",
-          "My risk management is better than my life management 📊 #QuantTrading #Finance",
-          "When your ensemble model is more diverse than your friend group 🤖 #AI #MachineLearning",
-          "The market is efficient, but my code is not 🐛 #QuantFinance #Programming",
-          "Feature importance: where SHAP values reveal more than therapy sessions 📊 #ML #DataScience",
-          "My backtest results are more impressive than my LinkedIn profile 📈 #Quantitative #Trading"
+          // Short & Punchy Viral Tweets
+          "Your neural network has better convergence than your dating life 🧠 #AI #MachineLearning #Viral",
+          "The market is efficient, but my code is not 🐛 #QuantFinance #Programming #Tech",
+          "Gradient descent: the algorithm that descends faster than my motivation on Mondays 📉 #DeepLearning #ML #Humor",
+          "My portfolio's Sharpe ratio is higher than my social skills 📊 #Finance #Quantitative #Stoicism",
+          "Backtesting: where hindsight bias meets overfitting anxiety 📉 #Trading #MachineLearning #Psychology",
+          "The only thing more volatile than crypto is my attention span during meetings 📈 #Trading #Tech #ADHD",
+          "Cross-validation is like dating multiple people to avoid overfitting your heart 💔 #MachineLearning #Humor #Dating",
+          "Feature importance: where SHAP values reveal more than therapy sessions 📊 #ML #DataScience #Psychology",
+          "When your ensemble model is more diverse than your friend group 🤖 #AI #MachineLearning #SocialLife",
+          "My risk management is better than my life management 📊 #QuantTrading #Finance #Stoicism",
+          
+          // Medium Descriptive Tweets
+          "Just discovered that my neural network's loss function is more complex than my dating algorithm. The irony? My dating life has zero convergence while my model converges in 3 epochs. Maybe I should apply the same optimization techniques to my social skills 🧠 #MachineLearning #DatingLife #AI #Optimization #Viral",
+          
+          "The real alpha isn't in the market, it's in the data preprocessing pipeline. While everyone obsesses over fancy models, the winners focus on clean data. Your model is only as good as your data - same principle applies to life decisions 📈 #QuantTrading #DataScience #LifeLessons #Stoicism #Trading",
+          
+          "Feature engineering is like cooking - the right ingredients make all the difference. But unlike cooking, you can't taste-test your features. You just hope your model doesn't throw up during validation 🍳 #ML #DataScience #Cooking #Humor #Tech",
+          
+          "When your model predicts market crashes better than it predicts my life decisions. The model: 'Market will crash in 3 months.' Me: 'I'll definitely start that project tomorrow.' The model was right 📊 #QuantFinance #AI #Procrastination #Psychology #Trading",
+          
+          "The market is efficient, but my code is not. While the market follows random walks, my bugs follow predictable patterns. At least I'm consistent in my inconsistency 🐛 #QuantFinance #Programming #Humor #Tech #Consistency",
+          
+          // Long Descriptive Viral Tweets
+          "Stoicism meets machine learning: Your model will fail. Your backtests will overfit. Your predictions will be wrong. But you keep iterating, keep learning, keep improving. The market doesn't care about your feelings, and neither does your loss function. Focus on what you can control: your data quality, your model architecture, your risk management. The rest is noise 📊 #Stoicism #MachineLearning #Trading #Psychology #LifeLessons #Viral",
+          
+          "The greatest irony of quantitative finance: We spend millions on sophisticated models to predict market movements, but the most profitable strategy is often 'buy and hold.' Sometimes the simplest solution is the best solution. Occam's razor applies to both algorithms and life decisions. Don't overcomplicate what doesn't need to be complicated 📈 #QuantFinance #Trading #Philosophy #Stoicism #Simplicity #Viral",
+          
+          "Your neural network has better emotional regulation than you do. It doesn't panic when validation loss spikes. It doesn't get excited when training accuracy hits 99%. It just keeps learning, keeps iterating, keeps improving. Maybe we should all be more like neural networks - focused on continuous improvement rather than emotional reactions 🧠 #AI #Psychology #Stoicism #MachineLearning #SelfImprovement #Viral",
+          
+          "The market doesn't care about your feelings, your opinions, or your predictions. It just is. Your job is to adapt, not to control. This is the essence of both successful trading and stoic philosophy. Focus on what you can control: your risk management, your position sizing, your emotional discipline. The market will do what the market will do 📊 #Trading #Stoicism #Psychology #RiskManagement #Philosophy #Viral",
+          
+          "Machine learning taught me more about life than any self-help book. Overfitting? Don't optimize for past performance. Cross-validation? Test your assumptions. Feature importance? Focus on what actually matters. Regularization? Don't overcomplicate things. Sometimes the best life lessons come from debugging your code 🧠 #MachineLearning #LifeLessons #Philosophy #Tech #SelfImprovement #Viral"
         ],
           schedules: [
             { time: "09:00", timezone: "America/New_York" },
@@ -111,13 +129,13 @@ class TwitterBot {
         const defaultAIConfig = {
           enabled: true,
           service: "openai", // or "local", "custom"
-          prompt: "Generate a witty, technical tweet about AI, machine learning, quantitative finance, or trading. Make it humorous but sophisticated, targeting AI/ML/Quant professionals. Include technical terms like 'neural networks', 'backtesting', 'Sharpe ratio', 'feature engineering', 'gradient descent', etc. Keep it under 280 characters and include relevant emojis and hashtags.",
+          prompt: "Generate viral, attention-grabbing tweets about AI, machine learning, quantitative finance, or trading. Mix short punchy tweets (under 100 chars) with longer descriptive ones (up to 280 chars). Include stoicism themes, irony, wit, and humor. Use multiple hashtags (5-8) including #Viral, #Stoicism, #Psychology, #LifeLessons. Make some tweets philosophical, some humorous, some technical. Target AI/ML/Quant professionals with high engagement potential.",
           maxLength: 280,
-          temperature: 0.8,
+          temperature: 0.9,
           includeHashtags: true,
-          hashtagCount: 3,
-          topics: ["AI", "MachineLearning", "QuantFinance", "Trading", "DataScience", "DeepLearning", "Quantitative", "Programming"],
-          style: "technical, witty, and sophisticated"
+          hashtagCount: 6,
+          topics: ["AI", "MachineLearning", "QuantFinance", "Trading", "DataScience", "DeepLearning", "Quantitative", "Programming", "Stoicism", "Psychology", "Philosophy"],
+          style: "viral, engaging, philosophical, and humorous"
         };
         await fs.writeJson(this.aiConfigFile, defaultAIConfig, { spaces: 2 });
       }
@@ -345,14 +363,25 @@ class TwitterBot {
       // For now, we'll use a simple template-based approach
       // You can integrate with OpenAI API or other AI services here
       const templates = [
-        "Just discovered that {topic} is actually {funny_observation}. Mind = blown 🤯",
-        "The real {topic} problem is {relatable_situation}. Can anyone else relate? 😅",
-        "Today's {topic} lesson: {witty_insight}. Life is full of surprises! ✨",
-        "Plot twist: {topic} is not what we thought. {funny_realization} 😂",
-        "The {topic} struggle is real when {relatable_problem}. Anyone else? 🙋‍♂️",
-        "When your {topic} model {technical_observation} 📊",
-        "The {topic} algorithm that {funny_behavior} 🧠",
-        "My {topic} implementation is {technical_comparison} 📈"
+        // Short & Punchy Viral Templates
+        "Your {topic} has better {technical_observation} than your {life_comparison} 🧠 #Viral #AI",
+        "The {topic} algorithm that {funny_behavior} 📊 #Tech #Humor",
+        "{topic} taught me more about life than any self-help book 📈 #Philosophy #Stoicism",
+        "When your {topic} model {technical_observation} but your life {life_comparison} 😂 #Psychology #Viral",
+        
+        // Medium Descriptive Templates
+        "Just discovered that my {topic} has better {technical_observation} than my {life_comparison}. The irony? My {life_comparison} has zero convergence while my {topic} converges in 3 epochs. Maybe I should apply the same optimization techniques to my {life_comparison} 🧠 #MachineLearning #LifeLessons #AI #Optimization #Viral #Stoicism",
+        
+        "The real alpha isn't in the {topic}, it's in the {technical_observation}. While everyone obsesses over fancy {topic}, the winners focus on {technical_observation}. Your {topic} is only as good as your {technical_observation} - same principle applies to life decisions 📈 #QuantTrading #DataScience #LifeLessons #Stoicism #Trading #Psychology",
+        
+        "{topic} is like {life_comparison} - the right ingredients make all the difference. But unlike {life_comparison}, you can't taste-test your {technical_observation}. You just hope your {topic} doesn't throw up during validation 🍳 #ML #DataScience #Humor #Tech #Viral",
+        
+        // Long Philosophical Templates
+        "Stoicism meets {topic}: Your {topic} will fail. Your {technical_observation} will overfit. Your predictions will be wrong. But you keep iterating, keep learning, keep improving. The {topic} doesn't care about your feelings, and neither does your {technical_observation}. Focus on what you can control: your {technical_observation}, your {topic} architecture, your risk management. The rest is noise 📊 #Stoicism #MachineLearning #Trading #Psychology #LifeLessons #Viral #Philosophy",
+        
+        "The greatest irony of {topic}: We spend millions on sophisticated {topic} to predict {technical_observation}, but the most profitable strategy is often 'buy and hold.' Sometimes the simplest solution is the best solution. Occam's razor applies to both algorithms and life decisions. Don't overcomplicate what doesn't need to be complicated 📈 #QuantFinance #Trading #Philosophy #Stoicism #Simplicity #Viral #Psychology",
+        
+        "Your {topic} has better emotional regulation than you do. It doesn't panic when {technical_observation} spikes. It doesn't get excited when {technical_observation} hits 99%. It just keeps learning, keeps iterating, keeps improving. Maybe we should all be more like {topic} - focused on continuous improvement rather than emotional reactions 🧠 #AI #Psychology #Stoicism #MachineLearning #SelfImprovement #Viral #Philosophy"
       ];
 
       const topics = aiConfig.topics || ["AI", "MachineLearning", "QuantFinance", "Trading"];
@@ -446,6 +475,17 @@ class TwitterBot {
         "Programming": "more logical than my decision making"
       };
 
+      const lifeComparisons = {
+        "AI": "dating life",
+        "MachineLearning": "career goals",
+        "QuantFinance": "social skills",
+        "Trading": "life decisions",
+        "DataScience": "cooking skills",
+        "DeepLearning": "understanding of taxes",
+        "Quantitative": "dating prospects",
+        "Programming": "morning routine"
+      };
+
       const template = templates[Math.floor(Math.random() * templates.length)];
       let tweet = template
         .replace('{topic}', topic)
@@ -456,22 +496,23 @@ class TwitterBot {
         .replace('{relatable_problem}', problems[topic] || "things don't go as planned")
         .replace('{technical_observation}', technicalObservations[topic] || "behaves unexpectedly")
         .replace('{funny_behavior}', funnyBehaviors[topic] || "does weird things")
-        .replace('{technical_comparison}', technicalComparisons[topic] || "more advanced than expected");
+        .replace('{technical_comparison}', technicalComparisons[topic] || "more advanced than expected")
+        .replace('{life_comparison}', lifeComparisons[topic] || "life choices");
 
       // Add hashtags if enabled
       if (aiConfig.includeHashtags) {
-        const technicalHashtags = {
-          "AI": ["#AI", "#MachineLearning", "#Tech"],
-          "MachineLearning": ["#ML", "#DataScience", "#AI"],
-          "QuantFinance": ["#QuantFinance", "#Trading", "#Finance"],
-          "Trading": ["#Trading", "#Quantitative", "#Finance"],
-          "DataScience": ["#DataScience", "#ML", "#Analytics"],
-          "DeepLearning": ["#DeepLearning", "#AI", "#NeuralNetworks"],
-          "Quantitative": ["#Quantitative", "#Finance", "#Trading"],
-          "Programming": ["#Programming", "#Tech", "#Coding"]
+        const viralHashtags = {
+          "AI": ["#AI", "#MachineLearning", "#Viral", "#Tech", "#Stoicism", "#Psychology"],
+          "MachineLearning": ["#ML", "#DataScience", "#AI", "#Viral", "#LifeLessons", "#Philosophy"],
+          "QuantFinance": ["#QuantFinance", "#Trading", "#Finance", "#Viral", "#Stoicism", "#Psychology"],
+          "Trading": ["#Trading", "#Quantitative", "#Finance", "#Viral", "#LifeLessons", "#Philosophy"],
+          "DataScience": ["#DataScience", "#ML", "#Analytics", "#Viral", "#Tech", "#Psychology"],
+          "DeepLearning": ["#DeepLearning", "#AI", "#NeuralNetworks", "#Viral", "#Tech", "#Philosophy"],
+          "Quantitative": ["#Quantitative", "#Finance", "#Trading", "#Viral", "#Stoicism", "#Psychology"],
+          "Programming": ["#Programming", "#Tech", "#Coding", "#Viral", "#LifeLessons", "#Humor"]
         };
-        const hashtags = technicalHashtags[topic] || [`#${topic}`, "#Tech", "#AI"];
-        tweet += ` ${hashtags.slice(0, aiConfig.hashtagCount || 3).join(' ')}`;
+        const hashtags = viralHashtags[topic] || [`#${topic}`, "#Viral", "#Tech", "#AI", "#Stoicism", "#Psychology"];
+        tweet += ` ${hashtags.slice(0, aiConfig.hashtagCount || 6).join(' ')}`;
       }
 
       // Ensure tweet is within character limit
