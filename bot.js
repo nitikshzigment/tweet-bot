@@ -1,18 +1,12 @@
-<<<<<<< HEAD
 /**
  * Twitter Bot - Automated Twitter posting bot
  * Dependencies: twitter-api-v2 node-cron dotenv fs-extra openai
  */
-=======
-// package.json dependencies needed:
-// npm install twitter-api-v2 node-cron dotenv fs-extra openai
->>>>>>> a1622bf7430c2dbe57895253cc7bf8ee8c39f7c5
 
 const { TwitterApi } = require('twitter-api-v2');
 const cron = require('node-cron');
 const fs = require('fs-extra');
 const path = require('path');
-<<<<<<< HEAD
 // Load environment variables - try multiple sources for Railway deployment
 require('dotenv').config({ path: './bot.env' });
 require('dotenv').config({ path: './.env' });
@@ -45,32 +39,6 @@ class TwitterBot {
       console.error('Failed to initialize TwitterBot:', error.message);
       throw error;
     }
-=======
-require('dotenv').config();
-
-class TwitterBot {
-  constructor() {
-    // Validate required environment variables
-    this.validateEnvironment();
-    
-    // Initialize Twitter client
-    this.client = new TwitterApi({
-      appKey: process.env.TWITTER_API_KEY,
-      appSecret: process.env.TWITTER_API_SECRET,
-      accessToken: process.env.TWITTER_ACCESS_TOKEN,
-      accessSecret: process.env.TWITTER_ACCESS_SECRET,
-    });
-
-    this.rwClient = this.client.readWrite;
-    this.contentFile = path.join(__dirname, 'content.json');
-    this.logFile = path.join(__dirname, 'bot.log');
-    this.postedFile = path.join(__dirname, 'posted_tweets.json');
-    this.aiConfigFile = path.join(__dirname, 'ai-config.json');
-    
-    // Track recursion depth to prevent infinite loops
-    this.recursionDepth = 0;
-    this.maxRecursionDepth = 3;
->>>>>>> a1622bf7430c2dbe57895253cc7bf8ee8c39f7c5
   }
 
   // Validate required environment variables
@@ -302,15 +270,10 @@ class TwitterBot {
       // Handle specific Twitter API errors
       if (error.code === 403) {
         this.log('Authentication error - check your API keys');
-<<<<<<< HEAD
         throw new Error('Twitter API authentication failed. Please check your credentials.');
       } else if (error.code === 429) {
         this.log('Rate limit exceeded - will retry later');
         throw new Error('Twitter API rate limit exceeded. Please wait before trying again.');
-=======
-      } else if (error.code === 429) {
-        this.log('Rate limit exceeded - will retry later');
->>>>>>> a1622bf7430c2dbe57895253cc7bf8ee8c39f7c5
       } else if (error.data?.detail?.includes('duplicate')) {
         this.log('Duplicate tweet detected - trying another one');
         
@@ -324,7 +287,6 @@ class TwitterBot {
           this.recursionDepth = 0;
           return null;
         }
-<<<<<<< HEAD
       } else if (error.data?.detail?.includes('length')) {
         this.log('Tweet too long - truncating');
         // Try with a shorter tweet
@@ -332,8 +294,6 @@ class TwitterBot {
           const truncatedText = text.substring(0, 277) + '...';
           return this.postTweet(truncatedText);
         }
-=======
->>>>>>> a1622bf7430c2dbe57895253cc7bf8ee8c39f7c5
       }
       
       throw error;
@@ -420,7 +380,6 @@ class TwitterBot {
   startScheduler() {
     this.log('Starting Twitter bot scheduler...');
 
-<<<<<<< HEAD
     try {
       // Post at scheduled times (adjust timezone as needed)
       // 9:00 AM EST
@@ -479,61 +438,6 @@ class TwitterBot {
       this.log(`Failed to start scheduler: ${error.message}`);
       throw error;
     }
-=======
-    // Post at scheduled times (adjust timezone as needed)
-    // 9:00 AM EST
-    cron.schedule('0 9 * * *', async () => {
-      this.log('Scheduled post at 9:00 AM');
-      try {
-        await this.postTweet();
-      } catch (error) {
-        this.log(`Scheduled post failed: ${error.message}`);
-      }
-    }, {
-      timezone: 'America/New_York'
-    });
-
-    // 2:30 PM EST
-    cron.schedule('30 14 * * *', async () => {
-      this.log('Scheduled post at 2:30 PM');
-      try {
-        await this.postTweet();
-      } catch (error) {
-        this.log(`Scheduled post failed: ${error.message}`);
-      }
-    }, {
-      timezone: 'America/New_York'
-    });
-
-    // 7:00 PM EST
-    cron.schedule('0 19 * * *', async () => {
-      this.log('Scheduled post at 7:00 PM');
-      try {
-        await this.postTweet();
-      } catch (error) {
-        this.log(`Scheduled post failed: ${error.message}`);
-      }
-    }, {
-      timezone: 'America/New_York'
-    });
-
-    // Optional: Random posts throughout the day (uncomment to enable)
-    // cron.schedule('0 */4 * * *', async () => {
-    //   // 25% chance to post every 4 hours
-    //   if (Math.random() < 0.25) {
-    //     this.log('Random scheduled post');
-    //     try {
-    //       await this.postTweet();
-    //     } catch (error) {
-    //     this.log(`Random post failed: ${error.message}`);
-    //     }
-    //   }
-    // }, {
-    //   timezone: 'America/New_York'
-    // });
-
-    this.log('Scheduler started successfully');
->>>>>>> a1622bf7430c2dbe57895253cc7bf8ee8c39f7c5
   }
 
   // Test the bot (posts immediately)
@@ -566,15 +470,11 @@ async function main() {
       
       case 'post':
         const customText = process.argv[3];
-<<<<<<< HEAD
         if (customText) {
           await bot.postTweet(customText);
         } else {
           console.log('Please provide tweet text: node bot.js post "Your tweet here"');
         }
-=======
-        await bot.postTweet(customText);
->>>>>>> a1622bf7430c2dbe57895253cc7bf8ee8c39f7c5
         break;
       
       case 'add':
@@ -630,10 +530,7 @@ async function main() {
     }
   } catch (error) {
     console.error('Bot initialization failed:', error.message);
-<<<<<<< HEAD
     console.error('Please check your bot.env file and ensure all required environment variables are set.');
-=======
->>>>>>> a1622bf7430c2dbe57895253cc7bf8ee8c39f7c5
     process.exit(1);
   }
 }
