@@ -53,8 +53,9 @@ class TwitterBot {
       'TWITTER_ACCESS_SECRET'
     ];
 
-    // Optional: Grok API for image generation
+    // Optional: AI APIs for image generation
     this.grokApiKey = process.env.GROK_API_KEY;
+    this.geminiApiKey = process.env.GEMINI_API_KEY || 'AIzaSyC37vTeQzcp4xLQ5faqRtoQ4DDOETKUdNU';
 
     const missingVars = requiredVars.filter(varName => !process.env[varName]);
     
@@ -166,12 +167,41 @@ class TwitterBot {
       
       this.log(`Generating image with prompt: "${imagePrompt}"`);
       
-      // Call Grok API for image generation
-      const imageUrl = await this.callGrokImageAPI(imagePrompt);
+      // Try Gemini API first, then Grok as fallback
+      let imageData = null;
       
+      // Try Gemini API
+      if (this.geminiApiKey) {
+        this.log('Trying Gemini API for image generation...');
+        imageData = await this.callGeminiImageAPI(imagePrompt);
+        if (imageData) {
+          this.log('Gemini API image generation successful');
+          return {
+            prompt: imagePrompt,
+            imageBuffer: imageData,
+            source: 'gemini'
+          };
+        }
+      }
+      
+      // Fallback to Grok API
+      if (this.grokApiKey) {
+        this.log('Trying Grok API as fallback...');
+        const imageUrl = await this.callGrokImageAPI(imagePrompt);
+        if (imageUrl) {
+          return {
+            prompt: imagePrompt,
+            imageUrl: imageUrl,
+            source: 'grok'
+          };
+        }
+      }
+      
+      this.log('No image generation APIs available or working');
       return {
         prompt: imagePrompt,
-        imageUrl: imageUrl
+        imageUrl: null,
+        source: 'none'
       };
       
     } catch (error) {
@@ -229,7 +259,22 @@ class TwitterBot {
     });
   }
 
-  // Call Grok API for image generation
+  // Call Gemini API for image generation (placeholder - can be replaced with actual implementation)
+  async callGeminiImageAPI(prompt) {
+    return new Promise((resolve, reject) => {
+      this.log(`Gemini API called with prompt: "${prompt}"`);
+      this.log(`Note: Gemini API doesn't generate images directly. You can integrate with:`);
+      this.log(`- Hugging Face API (free)`);
+      this.log(`- Stable Diffusion API`);
+      this.log(`- DALL-E API`);
+      this.log(`- Or use Grok API with credits`);
+      
+      // For now, return null to use text-only tweets
+      resolve(null);
+    });
+  }
+
+  // Call Grok API for image generation (fallback)
   async callGrokImageAPI(prompt) {
     return new Promise((resolve, reject) => {
       const postData = JSON.stringify({
@@ -486,13 +531,23 @@ class TwitterBot {
       
       // Post the tweet (with image if available)
       let tweet;
-      if (imageData && imageData.imageUrl) {
+      if (imageData && (imageData.imageUrl || imageData.imageBuffer)) {
         try {
-          // Download and upload image to Twitter
-          const mediaId = await this.uploadImageToTwitter(imageData.imageUrl);
+          let mediaId = null;
+          
+          if (imageData.imageBuffer) {
+            // Direct upload from buffer (Gemini)
+            mediaId = await this.rwClient.v1.uploadMedia(imageData.imageBuffer, { mimeType: 'image/jpeg' });
+            this.log(`Image uploaded directly from buffer (Media ID: ${mediaId})`);
+          } else if (imageData.imageUrl) {
+            // Download and upload from URL (Grok)
+            mediaId = await this.uploadImageToTwitter(imageData.imageUrl);
+            this.log(`Image uploaded from URL (Media ID: ${mediaId})`);
+          }
+          
           if (mediaId) {
             tweet = await this.rwClient.v2.tweet(text, { media: { media_ids: [mediaId] } });
-            this.log(`Tweet posted with image (Media ID: ${mediaId})`);
+            this.log(`Tweet posted with image from ${imageData.source} (Media ID: ${mediaId})`);
           } else {
             tweet = await this.rwClient.v2.tweet(text);
             this.log(`Image generation failed, posted text only`);
